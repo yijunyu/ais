@@ -11,10 +11,10 @@ ENV APACHE_LOG_DIR /var/log/apache2
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 775 /var/www
 
-RUN apt-get install -y openjdk-6-jdk
-ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk-amd64
+RUN apt-get install -y openjdk-8-jdk
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 
-RUN wget http://apache.mirrors.timporter.net//axis/axis2/java/core/1.6.2/axis2-1.6.2-bin.zip
+RUN wget http://archive.apache.org/dist/axis/axis2/java/core/1.6.2/axis2-1.6.2-bin.zip
 RUN apt-get install unzip
 RUN unzip axis2-1.6.2-bin.zip
 ENV AXIS2_HOME /axis2-1.6.2
@@ -36,4 +36,3 @@ RUN mkdir -p /var/log/supervisor
 ADD supervisord.conf /usr/local/etc/supervisord.conf
 EXPOSE 22 80 8080
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/local/etc/supervisord.conf"]
-

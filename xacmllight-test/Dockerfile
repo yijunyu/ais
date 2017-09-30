@@ -14,5 +14,4 @@ RUN $JAVA_HOME/bin/jar uvf xacmllight-2.2/authz.aar META-INF/services.xml
 RUN cp xacmllight-2.2/authz.aar axis2-1.6.2/repository/services
 RUN cd /xacmllight-2.2/test; chmod +x *.sh
 RUN apk add --update --no-cache curl
-EXPOSE 8080
-CMD /axis2-1.6.2/bin/axis2server.sh
+CMD cd xacmllight-2.2/test && sed -i -e '/axis2server.sh/d' ./send.sh && sed -i -e 's/localhost/axis_server/' ./send.sh && ./send.sh authz1.xml http://axis_server:8080/axis2/services/PdpService getDecision

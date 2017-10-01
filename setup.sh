@@ -26,8 +26,11 @@ function b() {
 	mysql-test)
 		docker run --rm --link mysql:server --privileged -it $tag mysql -h server
 	;;
+	docker-alpine-mysql)
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $tag
+	;;
 	owncloud)
-		docker run -d --rm --link mysql:server -p 80:80 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $tag
 	;;
 	esac
 	cd -
@@ -38,9 +41,9 @@ function services() {
 	# b apache
 	b axis
 	# b axis-test
-	b mysql
-	b mysql-test
-	#b owncloud
+	# b mysql
+	b docker-alpine-mysql
+	b owncloud
 }
 
 services

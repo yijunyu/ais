@@ -1,12 +1,6 @@
 ## Installation
 On a server with docker, you need to run the following command to set up an ownCloud server:
 ```
-./run.sh
-```
-
-## Development
-On a server with docker, you need to run the following command to set up an ownCloud server:
-```
 ./setup.sh
 ```
 

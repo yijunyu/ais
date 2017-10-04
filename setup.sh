@@ -9,14 +9,22 @@ function b() {
 	else
 		tag=$1
 	fi
+	prefix=
+	if [ "$2" != "" ]; then
+		prefix=$2
+	fi
 	case "$tag" in
 	upload)
 		docker login -u yijun
-		docker tag $tag yijun/$tag
-		docker push yijun/$tag
+		for tag in $(services); do
+			if [ "$(docker ps -f "name=$tag" --format '{{.Names}}')" == "$tag" ]; then
+				docker tag $tag yijun/$tag
+				docker push yijun/$tag
+		 	fi 
+		done
 	;;
 	xacmllight)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -dit -p 8080:8080 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -dit -p 8080:8080 --privileged -it $prefix$tag
 	;;
 	xacmllight-test)
 		if [ $(docker ps -f "name=xacmllight" --format '{{.Names}}') == "xacmllight" ]; then
@@ -26,19 +34,19 @@ function b() {
 		fi
 	;;
 	apache)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 81:80 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 81:80 --privileged -it $prefix$tag
 	;;
 	docker-alpine-mysql)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $prefix$tag
 	;;
 	owncloud)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $prefix$tag
 	;;
 	aware)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server --privileged -it $prefix$tag
 	;;
 	mosquitto)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -p 8883:8883 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -p 8883:8883 --privileged -it $prefix$tag
 	;;
 	php)
 		docker ps -f "name=apache" --format '{{.Names}}'
@@ -55,14 +63,31 @@ function b() {
 export -f b
 
 function services() {
-	b apache
-	b php
-	b xacmllight
-	# b xacmllight-test
-	b docker-alpine-mysql
-	b owncloud
-	b mosquitto
-	#b aware
+	echo apache
+	echo php
+	echo xacmllight
+	# echo xacmllight-test
+	echo docker-alpine-mysql
+	echo owncloud
+	echo mosquitto
+	#echo aware
 }
-
-services
+export -f services
+case "$1" in
+kill)
+	for s in $(services); do
+		docker rm -f $s
+	done
+	;;
+run)
+	for s in $(services); do
+		b $s yijun/
+	done
+	;;
+*)
+	for s in $(services); do
+		b $s
+	done
+	b upload
+	;;
+esac

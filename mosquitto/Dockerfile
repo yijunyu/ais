@@ -1,4 +1,4 @@
-FROM yijun/apache-alpine
+FROM alpine:latest
 MAINTAINER Yijun Yu <y.yu@open.ac.uk>
 RUN apk add --update --no-cache mosquitto mosquitto-clients
 RUN apk add --update --no-cache git

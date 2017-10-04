@@ -1,9 +1,13 @@
 #!/bin/bash
 function b() {
-	cd $1
-	tag=$(basename $(pwd))
-	if [ -f Dockerfile ]; then
-		docker build -t $tag .
+	if [ -d $1 ]; then
+		cd $1
+		tag=$(basename $(pwd))
+		if [ -f Dockerfile ]; then
+			docker build -t $tag .
+		fi
+	else
+		tag=$1
 	fi
 	case "$tag" in
 	upload)
@@ -43,11 +47,12 @@ function b() {
 		if [ $(docker ps -f "name=apache" --format '{{.Names}}') == "apache" ]; then
 			 docker exec apache apk add --update --no-cache php5-apache2 openssl\
     php5-json php5-phar php5-openssl php5-mysql php5-curl php5-mcrypt php5-pdo_mysql php5-ctype php5-gd php5-xml php5-dom php5-iconv php5-zip php5-zlib apache2-webdav zlib
-
 		fi
 	;;
 	esac
-	cd -
+	if [ -d $1 ]; then
+		cd -
+	fi
 }
 export -f b
 

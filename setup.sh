@@ -18,7 +18,7 @@ function b() {
 		docker run --rm --link axis:axis_server --privileged -it $tag
 	;;
 	apache)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 81:80 --privileged -it $tag
 	;;
 	mysql)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -v $(dirname $(pwd))/db:/data imega/mysql
@@ -32,18 +32,35 @@ function b() {
 	owncloud)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $tag
 	;;
+	aware)
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server --privileged -it $tag
+	;;
+	mosquitto)
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -p 8883:8883 --privileged -it $tag
+	;;
+	php)
+		docker ps -f "name=apache" --format '{{.Names}}'
+		if [ $(docker ps -f "name=apache" --format '{{.Names}}') == "apache" ]; then
+			 docker exec apache apk add --update --no-cache php5-apache2 openssl\
+    php5-json php5-phar php5-openssl php5-mysql php5-curl php5-mcrypt php5-pdo_mysql php5-ctype php5-gd php5-xml php5-dom php5-iconv php5-zip php5-zlib apache2-webdav zlib
+
+		fi
+	;;
 	esac
 	cd -
 }
 export -f b
 
 function services() {
-	# b apache
+	b apache
+	b php
 	b axis
 	# b axis-test
 	# b mysql
 	b docker-alpine-mysql
 	b owncloud
+	b mosquitto
+	b aware
 }
 
 services

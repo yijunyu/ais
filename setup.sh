@@ -16,7 +16,14 @@ function b() {
 		docker push yijun/$tag
 	;;
 	axis)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 8080:8080 --privileged -it $tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -dit -p 8080:8080 --privileged -it $tag
+	;;
+	axis-test)
+		if [ $(docker ps -f "name=axis" --format '{{.Names}}') == "axis" ]; then
+			docker exec axis apk add --update --no-cache curl
+			docker exec axis sed -i -e '/axis2server.sh/d' /xacmllight-2.2/test/send.sh 
+			docker exec -it axis sh /xacmllight-2.2/test/send.sh /xacmllight-2.2/test/authz1.xml http://localhost:8080/axis2/services/PdpService getDecision
+		fi
 	;;
 	apache)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 81:80 --privileged -it $tag
@@ -51,10 +58,11 @@ function services() {
 	b apache
 	b php
 	b axis
+	# b axis-test
 	b docker-alpine-mysql
 	b owncloud
 	b mosquitto
-	b aware
+	#b aware
 }
 
 services

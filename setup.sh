@@ -18,17 +18,8 @@ function b() {
 	axis)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 8080:8080 --privileged -it $tag
 	;;
-	axis-test)
-		docker run --rm --link axis:axis_server --privileged -it $tag
-	;;
 	apache)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 81:80 --privileged -it $tag
-	;;
-	mysql)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -v $(dirname $(pwd))/db:/data imega/mysql
-	;;
-	mysql-test)
-		docker run --rm --link mysql:server --privileged -it $tag mysql -h server
 	;;
 	docker-alpine-mysql)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $tag
@@ -60,8 +51,6 @@ function services() {
 	b apache
 	b php
 	b axis
-	# b axis-test
-	# b mysql
 	b docker-alpine-mysql
 	b owncloud
 	b mosquitto

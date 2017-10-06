@@ -1,5 +1,11 @@
 ## Installation
-On a server with docker, you need to run the following command to set up an ownCloud server:
+On a server with docker, you need to run the following command to install a mobile ownCloud server:
+```
+./setup.sh run
+```
+
+## Development
+To build mobile ownCloud from scratch, try:
 ```
 ./setup.sh
 ```

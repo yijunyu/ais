@@ -34,18 +34,15 @@ function b() {
 		fi
 	;;
 	apache)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 83:80 --privileged -it $prefix$tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 80:80 --privileged -it $prefix$tag
 	;;
 	docker-alpine-mysql)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $prefix$tag
 	;;
 	lamp)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 82:80 --privileged -it $prefix$tag
+		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $prefix$tag
 	;;
 	lamp-owncloud)
-		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 81:80 --privileged -it $prefix$tag
-	;;
-	owncloud)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $prefix$tag
 	;;
 	aware)
@@ -73,7 +70,6 @@ function services() {
 	echo xacmllight
 	# echo xacmllight-test
 	echo docker-alpine-mysql
-	echo owncloud
 	# echo apache
 	# echo lamp
 	echo lamp-owncloud

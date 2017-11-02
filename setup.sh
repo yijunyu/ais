@@ -37,18 +37,22 @@ function b() {
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run --name $tag -d -p 80:80 --privileged -it $prefix$tag
 	;;
 	docker-alpine-mysql)
+		git clone https://github.com/Leafney/docker-alpine-mysql .
+		docker build -t docker-alpine-mysql .
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -e MYSQL_DATABASE=clouddb -e MYSQL_USER=clouddbuser -e MYSQL_PASSWORD=cloudpassword -e MYSQL_ROOT_PASSWORD=admin -v $(dirname $(pwd))/db:/var/lib/mysql $prefix$tag
 	;;
 	lamp)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $prefix$tag
 	;;
 	lamp-owncloud)
+		docker build -t lamp-owncloud .
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server -p 80:80 --privileged -it $prefix$tag
 	;;
 	aware)
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag --link docker-alpine-mysql:server --privileged -it $prefix$tag
 	;;
 	mosquitto)
+		docker build -t $tag .
 		[[ $(docker ps -f "name=$tag" --format '{{.Names}}') == $tag ]] || docker run -d --rm --name $tag -p 8883:8883 --privileged -it $prefix$tag
 	;;
 	php)

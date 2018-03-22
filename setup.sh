@@ -57,7 +57,7 @@ function b() {
 	;;
 	php)
 		docker ps -f "name=apache" --format '{{.Names}}'
-		if [ $(docker ps -f "name=apache" --format '{{.Names}}') == "apache" ]; then
+		if [ "$(docker ps -f "name=apache" --format '{{.Names}}')" == "apache" ]; then
 			 docker exec apache apk add --update --no-cache php5-apache2 openssl\
     php5-json php5-phar php5-openssl php5-mysql php5-curl php5-mcrypt php5-pdo_mysql php5-ctype php5-gd php5-xml php5-dom php5-iconv php5-zip php5-zlib apache2-webdav zlib
 		fi
